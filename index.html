@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link href="https://fonts.googleapis.com/css?family=Lato:100,300,600" rel="stylesheet" type="text/css" />
+    <link href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet" type="text/css" />
+    <script src="http://code.jquery.com/jquery-git2.js"></script>
+    <link type="text/css" rel="stylesheet" href="style.css" />
+
+    <title>Pig Game</title>
+  </head>
+
+  <body>
+    <div class="left-profile">
+      <h1 class="player-name">Profile Player 1</h1>
+      <form style="padding: 15px;" class="firstPlayer">
+        <div>
+          <label>Username</label>
+          <input type="username" id="player-1-username" name="username" class="input-align" required />
+        </div>
+        <br />
+        <div>
+          <label>Age</label>
+          <input id="player-1-age" type="number" name="Age" class="input-align" required />
+        </div>
+        <br />
+        <div>
+          <label>Email</label>
+          <input id="player-1-email" type="email" name="Email" class="input-align" required />
+        </div>
+        <br />
+        <div>
+          <label>Game experience</label>
+          <input id="player-1-experience" type="text" name="Game experience" class="input-align" />
+        </div>
+
+        <button id="save-player-one" class="btn-save" type="button" onclick="savePlayer('firstPlayer')"><i class="ion-ios-download-outline"></i>Save</button>
+      </form>
+    </div>
+    <div class="wrapper clearfix">
+      <div class="player-0-panel active">
+        <div class="player-name" id="name-0">Player 1</div>
+        <div class="player-score" id="score-0">43</div>
+        <div class="player-current-box">
+          <div class="player-current-label">Current</div>
+          <div class="player-current-score" id="current-0">11</div>
+        </div>
+      </div>
+
+      <div class="player-1-panel">
+        <div class="player-name" id="name-1">Player 2</div>
+        <div class="player-score" id="score-1">72</div>
+        <div class="player-current-box">
+          <div class="player-current-label">Current</div>
+          <div class="player-current-score" id="current-1">0</div>
+        </div>
+      </div>
+
+      <input type="text" placeholder="Final score" class="final-score" />
+      <button class="btn-new"><i class="ion-ios-plus-outline"></i>New game</button>
+      <button class="btn-changeUsers"><i class="ion-ios-person-outline"></i>Change users</button>
+      <button class="btn-roll"><i class="ion-ios-loop"></i>Roll dice</button>
+      <button class="btn-hold"><i class="ion-ios-download-outline"></i>Hold</button>
+
+      <img src="dice-5.png" alt="Dice" id="style" class="dice" />
+      <img src="dice-3.png" alt="Dice2" id="style" class="secondDice" />
+    </div>
+    <div class="right-profile">
+      <h1 class="player-name">Profile Player 2</h1>
+      <form style="padding: 15px;" class="secondPlayer">
+        <div>
+          <label>Username</label>
+          <input type="username" id="player-2-username" name="username" class="input-align" required />
+        </div>
+        <br />
+        <div>
+          <label>Age</label>
+          <input id="player-2-age" type="number" name="Age" class="input-align" required />
+        </div>
+        <br />
+        <div>
+          <label>Email</label>
+          <input id="player-2-email" type="email" name="Email" class="input-align" required />
+        </div>
+        <br />
+        <div>
+          <label>Game experience</label>
+          <input id="player-2-experience" type="text" name="Game experience" class="input-align" />
+        </div>
+
+        <button id="save-player-two" class="btn-save" type="button" onclick="savePlayer('secondPlayer')"><i class="ion-ios-download-outline"></i>Save</button>
+      </form>
+    </div>
+    <div id="overlay"></div>
+    <script type="text/javascript " src="./script.js"></script>
+    <script>
+      let game = new PigGame();
+      init();
+      document.querySelector(".btn-roll").addEventListener("click", btnRoll);
+      document.querySelector(".btn-hold").addEventListener("click", btnHold);
+      document.querySelector(".btn-new").addEventListener("click", init);
+      document.querySelector(".btn-changeUsers").addEventListener("click", changeUsers);
+
+      function init(){
+        game = new PigGame()
+        document.querySelector(".dice").style.display = "none";
+        document.querySelector(".secondDice").style.display = "none";
+        document.getElementById("score-0").textContent = "0";
+        document.getElementById("score-1").textContent = "0";
+        document.getElementById("current-0").textContent = "0";
+        document.getElementById("current-1").textContent = "0";
+        document.getElementById("name-0").textContent = "Player 1";
+        document.getElementById("name-1").textContent = "Player 2";
+        document.querySelector(".player-0-panel").classList.remove("winner");
+        document.querySelector(".player-1-panel").classList.remove("winner");
+        document.querySelector(".player-0-panel").classList.remove("active");
+        document.querySelector(".player-1-panel").classList.remove("active");
+        document.querySelector(".player-0-panel").classList.add("active");
+      }
+
+      function btnRoll(){
+        let dice = game.getRandomIntInclusive(1, 6),
+          diceDOM = document.querySelector(".dice");
+        let secondDice = game.getRandomIntInclusive(1, 6),
+          dice2DOM = document.querySelector(".secondDice");
+
+        diceDOM.style.display = "block";
+        dice2DOM.style.display = "block";
+        diceDOM.src = "dice-" + dice + ".png";
+        dice2DOM.src = "dice-" + secondDice + ".png";
+
+        roundScore = game.btnRoll(dice, secondDice);
+        if(roundScore == 'nextPlayer'){
+          game.roundScore = 0;
+          nextPlayer();
+        } else {
+          document.querySelector("#current-" + game.activePlayer).textContent = roundScore;
+        }
+      }
+
+      function btnHold(){
+        let input = document.querySelector(".final-score").value;
+        score = game.btnHold(input)
+
+        if(score['winner']){
+          document.getElementById("score-" + game.activePlayer).textContent = score['winner'];
+          document.querySelector("#name-" + game.activePlayer).textContent = "WINNER";
+          document.querySelector(".dice").style.display = "none";
+          document.querySelector(".secondDice").style.display = "none";
+          document.querySelector(".player-" + game.activePlayer + "-panel").classList.remove("active");
+          document.querySelector(".player-" + game.activePlayer + "-panel").classList.add("winner");
+        } else if(Number.isInteger(score['nextPlayer'])){
+          document.getElementById("score-" + game.activePlayer).textContent = score['nextPlayer'];
+          nextPlayer();
+        }
+      }
+
+      function nextPlayer(){
+        document.getElementById("current-0").textContent = 0;
+        document.getElementById("current-1").textContent = 0;
+
+        document.querySelector(".player-0-panel").classList.toggle("active");
+        document.querySelector(".player-1-panel").classList.toggle("active");
+
+        document.querySelector(".dice").style.display = "none";
+        document.querySelector(".secondDice").style.display = "none";
+        game.nextPlayer();
+      }
+
+      function changeUsers(){
+        init();
+        document.getElementById('player-1-username').value = ""
+        document.getElementById('player-2-username').value = ""
+        document.getElementById('player-1-email').value = ""
+        document.getElementById('player-2-email').value = ""
+        document.getElementById('player-1-age').value = ""
+        document.getElementById('player-2-age').value = ""
+        document.getElementById('player-1-experience').value = ""
+        document.getElementById('player-2-experience').value = ""
+        document.querySelector("#overlay").style.display = "";
+      }
+
+      function savePlayer(playerId){
+        playerProfileData = {
+          'playerId': playerId,
+          'username': $(`form.${playerId} input`)[0].value,
+          'age': parseInt($(`form.${playerId} input`)[1].value, 10),
+          'email': $(`form.${playerId} input`)[2].value,
+          'experience': parseInt($(`form.${playerId} input`)[3].value, 10)
+        }
+        valid = formValidation(playerProfileData);
+        if(valid){
+          game.savePlayer(valid, playerProfileData);
+        }
+        if (game.firstPlayerProfile != undefined && game.secondPlayerProfile != undefined) {
+          document.querySelector("#overlay").style.display = "none";
+        }
+      }
+
+      function formValidation(playerProfileData){
+        $("p[id=error-message]").remove();
+        let inputErrorQuery = []
+
+        valid = game.formValidation(playerProfileData);
+
+        valid['playerId'].forEach(element => {
+          inputErrorQuery.push(`form.${element} input`);
+        });
+
+        valid['input'].forEach((element, value) => {
+          inputErrorQuery[value] = inputErrorQuery[value].concat(`[${element}]`)
+        });
+
+        inputErrorQuery.forEach(element => {
+          inputField = element.substring(element.length-2,element.length-1)
+          element = element.slice(0,-3);
+          $('<p id="error-message" style="font-size: 14px;color:red">Invalid input</p>').insertAfter($(`${element}`)[inputField]);
+        })
+        return valid['valid'];
+      }
+    </script>
+  </body>
+</html>
