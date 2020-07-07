@@ -18,12 +18,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/albertturcu/pigGame.git"
+    "url": "https://github.com/sakeebadnan/pigGame"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/albertturcu/pigGame/issues"
+    "url": "https://github.com/sakeebadnan/pigGame/issues"
   },
-  "homepage": "https://github.com/albertturcu/pigGame#readme"
+  "homepage": "https://github.com/sakeebadnan/pigGame#readme"
 }
